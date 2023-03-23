@@ -18,35 +18,35 @@ db.listings = require("../models/listing")
 //relations
 db.users.hasMany(db.userProjects, {
 	foreignKey: 'userId',
-	targetKey: "id"
+	// targetKey: "id"
 })
 db.users.hasMany(db.userSkills,{
 	foreignKey: 'userId',
-	targetKey: "id"
+	// targetKey: "id"
 })
 db.users.hasOne(db.userData,{
 	foreignKey: 'userId',
-	targetKey: "id"
+	// targetKey: "id"
 })
 db.userProjects.belongsTo(db.users, {
 	foreignKey: 'userId',
-	sourceKey: "id"
+	// sourceKey: "id"
 })
 db.userSkills.belongsTo(db.users, {
 	foreignKey: 'userId',
-	sourceKey: "id"
+	// sourceKey: "id"
 })
 db.userData.belongsTo(db.users, {
 	foreignKey: 'userId',
-	sourceKey: "id"
+	// sourceKey: "id"
 })
 db.users.hasMany(db.listings, {
 	foreignKey: 'createdBy',
-	targetKey: "id"
+	// targetKey: "id"
 })
 db.listings.belongsTo(db.users, {
 	foreignKey: 'createdBy',
-	sourceKey: "id"
+	// sourceKey: "id"
 })
 
 module.exports = db;

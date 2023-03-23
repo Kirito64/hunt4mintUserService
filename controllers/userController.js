@@ -90,13 +90,16 @@ const getUserData = async (userId)=>{
 		const userData = await db.userData.findOne({where: {userId: userId}})
 		console.log(userData)
 		const projects = await db.listings.findAll({where: {createdBy: userId}});
-		delete userData.dataValues.id;
-		console.log(projects)
-		let data = {
-			...userData.dataValues,
-			projects,
-		}
-		return data;
+		const user = await db.users.findOne({where: {id: userId},
+			include: [
+				{model: db.userData},
+				{model: db.listings}
+			],
+		})
+		// console.log(user)
+		let userdata = JSON.parse(JSON.stringify(user))
+		delete userdata.password
+		return userdata;
 	}
 	catch(err){
 		throw err;
