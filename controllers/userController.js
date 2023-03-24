@@ -1,8 +1,30 @@
 const db = require('../config/db')
+const aws = require("../config/aws")
+
+const uploadToS3 = async  (file,fileName, bucket="hunt4mint")=>{
+	const params = {
+		Bucket: bucket,
+		Key: fileName,
+		Body: file,
+	}
+	try{
+		const fileLocation = await aws.s3.upload(params).promise()
+		return fileLocation.Location
+	}
+	catch(err){
+		throw err;
+	}
+}
+
 
 const addUserData = async (userData)=>{
 	try{
-		const newData = await db.userData.create(userData);
+		let profileImage = await uploadToS3(userData.profileImage);
+		let coverImage = await uploadToS3(userData.coverImage);
+		userDataReconstrued = {...userData}
+		userDataReconstrued.profileImage = profileImage;
+		userDataReconstrued.coverImage = coverImage;
+		const newData = await db.userData.create(userDataReconstrued);
 		return newData;
 	}
 	catch(err){
@@ -13,7 +35,13 @@ const addUserData = async (userData)=>{
 
 const updateUserData = async (userData)=>{
 	try{
-		const updatedData = await db.userData.update(user, {where: {id: userData.id}});
+		let profileImage = await uploadToS3(userData.profileImage);
+		let coverImage = await uploadToS3(userData.coverImage);
+		userDataReconstrued = {...userData}
+		userDataReconstrued.profileImage = profileImage;
+		userDataReconstrued.coverImage = coverImage;
+		const updatedData = await db.userData.update(userDataReconstrued, {where: {id: userData.id}});
+		return updatedData;
 	}
 	catch(err){
 		throw err;
@@ -87,9 +115,6 @@ const deleteUserProject = async(projectId)=>{
 
 const getUserData = async (userId)=>{
 	try{
-		const userData = await db.userData.findOne({where: {userId: userId}})
-		console.log(userData)
-		const projects = await db.listings.findAll({where: {createdBy: userId}});
 		const user = await db.users.findOne({where: {id: userId},
 			include: [
 				{model: db.userData},
@@ -105,6 +130,26 @@ const getUserData = async (userId)=>{
 		throw err;
 	}
 }
+
+const getUserDataTalent = async (userId)=>{
+	try{
+		const user = await db.users.findOne({where: {id: userId,  userType: "talent"},
+			include: [
+				{model: db.talentData},
+				{model: db.talentSchool},
+				{model: db.talentAwards}
+			],
+		})
+		// console.log(user)
+		let userdata = JSON.parse(JSON.stringify(user))
+		delete userdata.password
+		return userdata;
+	}
+	catch(err){
+		throw err;
+	}
+}
+
 
 const getUserProjects = async (userId)=>{
 	try{
@@ -126,7 +171,44 @@ const getUserSkills = async (userId)=>{
 	}	
 }
 
+const addTalentData = async (userData, userId)=>{
+	userData.userId = userId;
+	try{
+		let profileImage =await uploadToS3(userData.profileImage);
+		let coverImage = await uploadToS3(userData.coverImage);
+		userDataReconstrued = {...userData}
+		userDataReconstrued.profileImage = profileImage;
+		userDataReconstrued.coverImage = coverImage;
+		const newData = await db.talentData.create(data);
+		return newData
+	} catch (err) {
+		throw err;
+	}
+}
+
+const addTalentSchool = async (data, userId)=>{
+	data.userId = userId;
+	try{
+		const newSchool = await db.talentSchool.create(data);
+		return newSchool
+	}
+	catch(err){
+		throw err;
+	}
+}
+
+const addTalentAwards = async (data, userId)=>{
+	data.userId = userId;
+	try{
+		const newAwards = await db.talentAwards.create(data)
+		return newAwards
+	} catch(err){
+		throw err;
+	}
+}
+
 module.exports = {
+	uploadToS3,
 	addUserData,
 	addUserSkills,
 	updateUserData,
@@ -138,4 +220,8 @@ module.exports = {
 	getUserData,
 	getUserProjects,
 	getUserSkills,
+	getUserDataTalent,
+	addTalentData,
+	addTalentSchool,
+	addTalentAwards
 }

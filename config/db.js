@@ -14,6 +14,9 @@ db.userData = require("../models/userData")
 db.userProjects = require("../models/userProjects")
 db.userSkills = require("../models/userSkills")
 db.listings = require("../models/listing")
+db.talentData = require("../models/talentData")
+db.talentSchool = require("../models/talentSchool")
+db.talentAwards = require("../models/talentAwards")
 
 //relations
 db.users.hasMany(db.userProjects, {
@@ -47,6 +50,27 @@ db.users.hasMany(db.listings, {
 db.listings.belongsTo(db.users, {
 	foreignKey: 'createdBy',
 	// sourceKey: "id"
+})
+
+db.users.hasOne(db.talentData, {
+	foreignKey: "userId"
+})
+db.talentData.belongsTo(db.users, {
+	foreignKey: "userId"
+})
+
+db.users.hasMany(db.talentSchool, {
+	foreignKey: "userId"
+})
+db.talentSchool.belongsTo(db.users, {
+	foreignKey: "userId"
+})
+
+db.users.hasMany(db.talentAwards, {
+	foreignKey: "userId"
+})
+db.talentAwards.belongsTo(db.users, {
+	foreignKey: "userId"
 })
 
 module.exports = db;
