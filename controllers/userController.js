@@ -87,9 +87,6 @@ const deleteUserProject = async(projectId)=>{
 
 const getUserData = async (userId)=>{
 	try{
-		const userData = await db.userData.findOne({where: {userId: userId}})
-		console.log(userData)
-		const projects = await db.listings.findAll({where: {createdBy: userId}});
 		const user = await db.users.findOne({where: {id: userId},
 			include: [
 				{model: db.userData},
@@ -105,6 +102,26 @@ const getUserData = async (userId)=>{
 		throw err;
 	}
 }
+
+const getUserDataTalent = async (userId)=>{
+	try{
+		const user = await db.users.findOne({where: {id: userId,  userType: "talent"},
+			include: [
+				{model: db.talentData},
+				{model: db.talentSchool},
+				{model: db.talentAwards}
+			],
+		})
+		// console.log(user)
+		let userdata = JSON.parse(JSON.stringify(user))
+		delete userdata.password
+		return userdata;
+	}
+	catch(err){
+		throw err;
+	}
+}
+
 
 const getUserProjects = async (userId)=>{
 	try{
@@ -126,6 +143,37 @@ const getUserSkills = async (userId)=>{
 	}	
 }
 
+const addTalentData = async (data, userId)=>{
+	data.userId = userId;
+	try{
+		const newData = await db.talentData.create(data);
+		return newData
+	} catch (err) {
+		throw err;
+	}
+}
+
+const addTalentSchool = async (data, userId)=>{
+	data.userId = userId;
+	try{
+		const newSchool = await db.talentSchool.create(data);
+		return newSchool
+	}
+	catch(err){
+		throw err;
+	}
+}
+
+const addTalentAwards = async (data, userId)=>{
+	data.userId = userId;
+	try{
+		const newAwards = await db.talentAwards.create(data)
+		return newAwards
+	} catch(err){
+		throw err;
+	}
+}
+
 module.exports = {
 	addUserData,
 	addUserSkills,
@@ -138,4 +186,8 @@ module.exports = {
 	getUserData,
 	getUserProjects,
 	getUserSkills,
+	getUserDataTalent,
+	addTalentData,
+	addTalentSchool,
+	addTalentAwards
 }

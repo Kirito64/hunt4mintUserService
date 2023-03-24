@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { getUserData, updateUserData, addUserData, addUserSkill, addUserProject } = require('../controllers/userController');
+const { getUserData, getUserDataTalent, updateUserData, addUserData, addUserSkill, addUserProject, addTalentData, addTalentAwards, addTalentSchool } = require('../controllers/userController');
 const {isAuthenticated} = require("../middleware/auth")
 
 router.get("/getUserData/:id", isAuthenticated, async (req,res)=>{
@@ -102,6 +102,50 @@ router.get("/getUser", isAuthenticated, async(req, res)=>{
 		res.status(401).send({message: "user not found"})
 	}
 });
+
+router.get("/getUserTalent", async(req,res)=>{
+	if(req.user){
+		const userData = await getUserDataTalent(req.user.id);
+		res.status(200).send(userData)
+	}
+	else{
+		res.status(401).send({message: "user not found"})
+	}
+})
+
+router.post("/addTalentData/:userId", async(req, res) => {
+	let user = req.params.user;
+	let data = req.body
+	try{
+		const newData = await addTalentData(data, user);
+		res.status(200).send({message: "Talent Data added successfully"})
+	}
+	catch{
+		res.status(500).send({message: "internal server error"})
+	}
+})
+
+router.post("/addTalentAward/:userId", async(req, res) => {
+	let user = req.params.userId;
+	let data = req.body
+	try {
+		const newAward = await addTalentAwards(data, user)
+		res.status(200).send({message: "Success"})
+	} catch (err) {
+		res.status(500).send({message: err.message})
+	}
+})
+
+router.post("/addTalentSchool/:userId", async(req,res)=>{
+	let user = req.params.userId;
+	let data = req.body
+	try {
+		const newSchool = await addTalentSchool(data, user)
+		res.status(200).send({message: "School added successfully"})
+	} catch (err) {
+		res.status(500).send({message: err.message})
+	}
+})
 
 router.put("/updateUserProject/:id", isAuthenticated, async(req, res)=>{
 
