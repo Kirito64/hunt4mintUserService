@@ -87,8 +87,12 @@ const addUserProject = async (projectData, userId)=>{
 		data.userId = userId;
 		data.projectName = projectData.projectName;
 		data.projectLink = projectData.projectLink;
-		const newSkill = await db.userProjects.create(data);
-		return newSkill;
+		const media = await Promise.all(projectData.media.map(async(i)=>{
+			return await uploadToS3(i.data, i.name)
+		}))
+		data.projectMedia = media;
+		const newProject = await db.userProjects.create(data);
+		return newProject;
 	}
 	catch(err){
 		throw err;
@@ -97,6 +101,12 @@ const addUserProject = async (projectData, userId)=>{
 
 const updateUserProject = async(projectId, projectData)=>{
 	try {
+		if(projectData.media){
+			const media = await Promise.all(projectData.media.map(async(i)=>{
+				return await uploadToS3(i.data, i.name)
+			}))
+			projectData.media = media
+		}
 		const updatedProjectData = await db.userProjects.update(projectData, {where: {id: projectId}})
 		return updatedProjectData;
 	} catch (error) {

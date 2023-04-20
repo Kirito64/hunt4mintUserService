@@ -16,8 +16,11 @@ const userProjects = sequelize.define("userproject", {
 		type: DataTypes.STRING,
 		required: true,
 	},
-	projectLink :{
-		type: DataTypes.STRING,	
+	projectMedia : {
+		type: DataTypes.ARRAY(DataTypes.STRING),
+	},
+	projectLink : {
+		type: DataTypes.STRING,
 	}
 })
 

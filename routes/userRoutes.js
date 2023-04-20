@@ -66,7 +66,7 @@ router.post("/addUserSkill", isAuthenticated, async(req, res)=>{
 
 router.post("/addUserProjects", isAuthenticated, async(req, res)=>{
 	const userId = req.user.id;
-	const projects = req.body.projects; 
+	const projects = req.body.projects;
 	try{
 		projects.forEach(async (project)=>{
 			await addUserProject(project, userId);
@@ -81,7 +81,8 @@ router.post("/addUserProjects", isAuthenticated, async(req, res)=>{
 
 router.post("/addUserProject", isAuthenticated, async(req, res)=>{
 	const userId = req.user.id;
-	const project = req.body.project; 
+	let project = req.body.project; 
+	project.media = req.files;
 
 	try{
 		const newProject = await addUserProject(project, userId);
