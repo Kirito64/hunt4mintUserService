@@ -181,6 +181,7 @@ const getUserSkills = async (userId)=>{
 	}	
 }
 
+<<<<<<< HEAD
 const addTalentData = async (userData, userId)=>{
 	userData.userId = userId;
 	try{
@@ -189,6 +190,11 @@ const addTalentData = async (userData, userId)=>{
 		userDataReconstrued = {...userData}
 		userDataReconstrued.profileImage = profileImage;
 		userDataReconstrued.coverImage = coverImage;
+=======
+const addTalentData = async (data, userId)=>{
+	data.userId = userId;
+	try{
+>>>>>>> ba6d9b7029231e4d3339f9356f32904d152ac9f8
 		const newData = await db.talentData.create(data);
 		return newData
 	} catch (err) {
